@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	spec.xsd, the IT University of Copenhagen's proposed XML Schema
+	for <spec> documents
+	Copyright © Alexander Faithfull 2010, 2011, 2012
+	
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided that the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:rule="http://www.itu.dk/research/pls/xmlns/2011/rule"
+            xmlns:spec="http://www.itu.dk/research/pls/xmlns/2012/simulation-spec"
+            xmlns:bigraph="http://www.itu.dk/research/pls/xmlns/2010/bigraph"
+            xmlns:signature="http://www.itu.dk/research/pls/xmlns/2010/signature"
+            targetNamespace="http://www.itu.dk/research/pls/xmlns/2012/simulation-spec">
+
+	<xsd:import
+		namespace="http://www.itu.dk/research/pls/xmlns/2011/rule"
+		schemaLocation="rule.xsd" />
+
+	<xsd:import
+		namespace="http://www.itu.dk/research/pls/xmlns/2010/bigraph"
+		schemaLocation="bigraph.xsd" />
+
+	<xsd:import
+		namespace="http://www.itu.dk/research/pls/xmlns/2010/signature"
+		schemaLocation="signature.xsd" />
+
+	<xsd:group name="anyForeignElements">
+		<xsd:sequence>
+			<xsd:any namespace="##other"
+				processContents="lax"
+				minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:element name="spec">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:choice minOccurs="0">
+					<xsd:element ref="spec:signature" />
+					<xsd:element ref="signature:signature" />
+				</xsd:choice>
+				<xsd:choice minOccurs="0" maxOccurs="unbounded">
+					<xsd:element ref="spec:rule" />
+					<xsd:element ref="rule:rule" />
+				</xsd:choice>
+				<xsd:choice minOccurs="0">
+					<xsd:element ref="spec:model" />
+					<xsd:element ref="bigraph:bigraph" />
+				</xsd:choice>
+				<xsd:element ref="spec:external" minOccurs="0" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="signature">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="spec:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="rule">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="spec:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="model">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="spec:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="external">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="spec:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	sortset.xsd, the IT University of Copenhagen's proposed XML Schema
+	for <sortset> documents
+	Copyright © Alexander Faithfull 2010, 2011, 2012
+	
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided that the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:sortset="http://www.itu.dk/research/pls/xmlns/2013/sortset"
+            targetNamespace="http://www.itu.dk/research/pls/xmlns/2013/sortset">
+	<xsd:group name="anyForeignElements">
+		<xsd:sequence>
+			<xsd:any namespace="##other"
+				processContents="lax"
+				minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:group>
+	
+	<xsd:element name="sortset">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:element ref="sortset:sortset"
+					minOccurs="0"/>
+				<xsd:element ref="sortset:placesort"
+					minOccurs="0"
+					maxOccurs="unbounded" />
+				<xsd:element ref="sortset:linksort"
+					minOccurs="0"
+					maxOccurs="unbounded" />
+				<xsd:group ref="sortset:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+
+		<xsd:unique name="PlaceSortNames">
+			<xsd:selector xpath="sortset:placesort" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>	
+		<xsd:unique name="LinkSortNames">
+			<xsd:selector xpath="sortset:linksort" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+	</xsd:element>
+
+	<xsd:element name="placesort">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sortset:placesort" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="sortset:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="linksort">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sortset:linksort" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="sortset:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

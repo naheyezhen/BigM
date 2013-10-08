@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	signature.xsd, the IT University of Copenhagen's proposed XML Schema
+	for <signature> documents
+	Copyright © Alexander Faithfull 2010, 2011, 2012
+	
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided that the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:signature="http://www.itu.dk/research/pls/xmlns/2010/signature"
+            xmlns:formationrules="http://www.itu.dk/research/pls/xmlns/2013/formationrules"
+            targetNamespace="http://www.itu.dk/research/pls/xmlns/2010/signature">
+            
+    <xsd:import
+		namespace="http://www.itu.dk/research/pls/xmlns/2013/formationrules"
+		schemaLocation="formationrules.xsd" />
+
+	<xsd:group name="anyForeignElements">
+		<xsd:sequence>
+			<xsd:any namespace="##other"
+				processContents="lax"
+				minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:element name="signature">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:choice minOccurs="0">
+					<xsd:element ref="signature:formationrules" />
+					<xsd:element ref="formationrules:formationrules" />
+				</xsd:choice>
+				<xsd:element ref="signature:signature"
+					minOccurs="0"
+					maxOccurs="unbounded" />
+				<xsd:element ref="signature:control"
+					minOccurs="0"
+					maxOccurs="unbounded" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+
+		<xsd:unique name="ControlNames">
+			<xsd:selector xpath="signature:control" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+	</xsd:element>
+	
+	<xsd:element name="formationrules">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="signature:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+		
+	<xsd:element name="control">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="signature:port" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="signature:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="placesort" type="xsd:string" use="optional" />
+			<xsd:attribute name="kind">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="atomic" />
+						<xsd:enumeration value="active" />
+						<xsd:enumeration value="passive" />
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+			<xsd:attribute name="parameter" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+		
+		<xsd:unique name="PortNames">
+			<xsd:selector xpath="signature:port" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+	</xsd:element>
+
+	<xsd:element name="port">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="signature:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="portsort" type="xsd:string" use="optional" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

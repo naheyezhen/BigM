@@ -1,0 +1,59 @@
+package dk.itu.bigm.editors.bigraph.parts;
+
+import java.util.List;
+
+import org.bigraph.model.Bigraph;
+import org.bigraph.model.Layoutable;
+import org.bigraph.model.Root;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.gef.EditPolicy;
+
+import dk.itu.bigm.editors.bigraph.figures.RootFigure;
+import dk.itu.bigm.editors.bigraph.policies.LayoutableDeletePolicy;
+import dk.itu.bigm.editors.bigraph.policies.LayoutableLayoutPolicy;
+
+/**
+ * RootParts represent {@link Root}s, the containers immediately below the
+ * {@link Bigraph}.
+ * @see Root
+ * @author alec
+ */
+public class RootPart extends ContainerPart {
+	@Override
+	public Root getModel() {
+		return (Root)super.getModel();
+	}
+	
+	@Override
+	protected IFigure createFigure() {
+		return new RootFigure();
+	}
+
+	@Override
+	protected void createEditPolicies() {
+		super.createEditPolicies();
+		
+		installEditPolicy(EditPolicy.LAYOUT_ROLE, new LayoutableLayoutPolicy());
+		installEditPolicy(EditPolicy.COMPONENT_ROLE, new LayoutableDeletePolicy());
+	}
+	
+	@Override
+	protected void refreshVisuals(){
+		super.refreshVisuals();
+		
+		RootFigure figure = (RootFigure)getFigure();
+		Root model = getModel();
+
+		figure.setName(model.getName());
+	}
+	
+	@Override
+	public List<? extends Layoutable> getModelChildren() {
+		return getModel().getChildren();
+	}
+	
+	@Override
+	public String getToolTip() {
+		return "Root " + getModel().getName();
+	}
+}

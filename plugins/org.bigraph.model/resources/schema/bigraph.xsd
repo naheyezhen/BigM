@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	bigraph.xsd, the IT University of Copenhagen's proposed XML Schema for
+	<bigraph> documents
+	Copyright © Alexander Faithfull 2010
+	
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided that the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:bigraph="http://www.itu.dk/research/pls/xmlns/2010/bigraph"
+            xmlns:signature="http://www.itu.dk/research/pls/xmlns/2010/signature"
+            targetNamespace="http://www.itu.dk/research/pls/xmlns/2010/bigraph">
+
+	<xsd:import
+		namespace="http://www.itu.dk/research/pls/xmlns/2010/signature"
+		schemaLocation="signature.xsd" />
+
+	<xsd:group name="anyForeignElements">
+		<xsd:sequence>
+			<xsd:any namespace="##other"
+				processContents="lax"
+				minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:attributeGroup name="pointAttributes">
+		<xsd:attribute name="name" type="xsd:string" use="required" />
+		<xsd:attribute name="link" type="xsd:string"/>
+		<xsd:attribute name="innersort" type="xsd:string"/>
+	</xsd:attributeGroup>
+
+	<xsd:element name="bigraph">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:choice>
+					<xsd:element ref="bigraph:signature" />
+					<xsd:element ref="signature:signature" />
+				</xsd:choice>
+				<xsd:element ref="bigraph:edge" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:outername" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:root" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:innername" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+
+		<xsd:unique name="RootNames">
+			<xsd:selector xpath="bigraph:root" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+
+		<xsd:unique name="NodeNames">
+			<xsd:selector xpath=".//bigraph:node" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+		
+		<xsd:unique name="SiteNames">
+			<xsd:selector xpath=".//bigraph:site" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+		
+		<xsd:unique name="EdgeAndOuterNameNames">
+			<xsd:selector xpath="bigraph:edge|bigraph:outername" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+		
+		<xsd:unique name="InnerNameNames">
+			<xsd:selector xpath="bigraph:innername" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+		
+		<xsd:keyref name="PointsConnectedToLinks" refer="bigraph:EdgeAndOuterNameNames">
+			<xsd:selector xpath=".//bigraph:port|.//bigraph:innername" />
+			<xsd:field xpath="@link" />
+		</xsd:keyref>
+	</xsd:element>
+		
+	<xsd:element name="signature">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="root">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="bigraph:node" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:site" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="node">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="bigraph:port" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:node" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:element ref="bigraph:site" minOccurs="0" maxOccurs="unbounded" />
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="optional"/>
+			<xsd:attribute name="control" type="xsd:string" use="required" />
+			<xsd:attribute name="parameter" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+		
+		<xsd:unique name="PortNames">
+			<xsd:selector xpath="bigraph:port" />
+			<xsd:field xpath="@name" />
+		</xsd:unique>
+	</xsd:element>
+	
+	<xsd:element name="site">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="alias" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="port">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="link" type="xsd:string"/>
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="innername">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="link" type="xsd:string"/>
+			<xsd:attribute name="innersort" type="xsd:string"/>
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="edge">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="linksort" type="xsd:string" use="optional" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="outername">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:group ref="bigraph:anyForeignElements" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" use="required" />
+			<xsd:attribute name="linksort" type="xsd:string"/>
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

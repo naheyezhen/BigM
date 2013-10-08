@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	spec.xsd, the IT University of Copenhagen's proposed XML Schema
+	for <spec> documents
+	Copyright © Alexander Faithfull 2010, 2011, 2012
+	
+	Copying and distribution of this file, with or without modification,
+	are permitted in any medium without royalty provided that the copyright
+	notice and this notice are preserved. This file is offered as-is,
+	without any warranty.
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:sorting="http://www.itu.dk/research/pls/xmlns/2013/sorting"
+            targetNamespace="http://www.itu.dk/research/pls/xmlns/2013/sorting">
+
+	<xsd:group name="anyForeignElements">
+		<xsd:sequence>
+			<xsd:any namespace="##other"
+				processContents="lax"
+				minOccurs="0"
+				maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:group>
+
+	<xsd:element name="sorting">
+		<xsd:complexType>
+			<xsd:sequence minOccurs="0">
+				<xsd:element ref="sorting:placesort" minOccurs="0" />
+				<xsd:element ref="sorting:linksort" minOccurs="0" />
+				<xsd:element ref="sorting:constraints" minOccurs="0" />
+			</xsd:sequence>
+			<xsd:attribute name="src" type="xsd:string" />
+			<xsd:anyAttribute namespace="##other"
+				processContents="lax" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="placesort">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sorting:controls" minOccurs="0" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="linksort">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sorting:ports" minOccurs="0" />
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="constraints">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sorting:placeconstraint" minOccurs="0" />
+				<xsd:element ref="sorting:linkconstraint" minOccurs="0" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="controls">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sorting:control" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="control">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="ports">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="sorting:port" />
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="port">
+		<xsd:complexType>
+			<xsd:attribute name="control" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="placeconstraint">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" />
+			<xsd:attribute name="parent" type="xsd:string" />
+			<xsd:attribute name="child" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+	
+	<xsd:element name="linkconstraint">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" />
+			<xsd:attribute name="one" type="xsd:string" />
+			<xsd:attribute name="another" type="xsd:string" />
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>

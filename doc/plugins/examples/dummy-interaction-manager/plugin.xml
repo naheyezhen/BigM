@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="dk.itu.bigm.interactionManagers">
+      <interactionManager
+            class="example.bigm.interaction_manager.dummy.DummyInteractionManager"
+            id="example.bigm.interaction_manager.dummy"
+            name="Dummy interaction manager for BigM">
+      </interactionManager>
+   </extension>
+
+</plugin>

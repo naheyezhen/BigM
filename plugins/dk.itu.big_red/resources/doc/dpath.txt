@@ -1,0 +1,25 @@
+Pharmacy.Pill[pp1].nil{10, 19, 31, 6, 26, 37, 23}
+Pharmacy.$1{0, 5, 28, 41, 32, 27, 2, 34, 20, 25, 30, 39, 1, 33, 4, 42, 12, 7, 3, 17, 35, 40, 21, 11, 16}
+ConsultingRoom.$0{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+Patient[patient_prescription,patient_bill_payed].nil{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+ConsultingRoom.Decoction[patient_decoction].nil{28, 27, 7, 17, 21}
+Pharmacy.Patient[patient_prescription,patient_bill_payed].nil{0, 23, 28, 31, 36, 19, 27, 32, 2, 39, 20, 25, 30, 1, 33, 38, 13, 4, 26, 37, 42, 12, 7, 17, 3, 35, 40, 21, 11, 16, 5}
+ConsultingRoom.Patient[patient_prescription,p2].nil{39, 33}
+Hospital.$0{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+Patient[patient_decoction,p2].nil{11, 28, 32, 27, 39, 25, 30, 1, 4, 42, 12, 7, 17, 35, 40, 21, 16, 5}
+Pharmacy.Material.nil{0, 28, 41, 32, 27, 2, 34, 39, 20, 25, 30, 1, 33, 38, 29, 24, 4, 42, 12, 7, 17, 3, 35, 40, 21, 11, 16, 5}
+ChargingRoom.Patient[patient_decoction,p2].nil{32, 30, 12, 35, 42, 5}
+Decoction[patient_decoction].nil{11, 28, 32, 27, 39, 25, 30, 1, 4, 42, 12, 7, 17, 35, 40, 21, 16, 5}
+Pharmacy.Decoction[p1].nil{0, 5, 28, 41, 32, 27, 2, 34, 20, 25, 30, 39, 1, 33, 4, 42, 12, 7, 3, 17, 35, 40, 21, 11, 16}
+ConsultingRoom.Computer[connected].Prescription[patient_prescription].nil{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+Hospital.Patient[p1,p2].nil{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+ChargingRoom.$0{0, 18, 23, 10, 28, 31, 41, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 35, 40, 21, 16, 11, 15, 5}
+ConsultingRoom.Patient[patient_decoction,p2].nil{28, 27, 7, 17, 21}
+Patient[patient_prescription,p2].nil{0, 9, 5, 28, 27, 17, 7, 35, 42, 21, 16}
+ChargingRoom.Patient[patient_prescription,patient_bill_payed].nil{0, 18, 23, 10, 28, 31, 41, 19, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 35, 40, 21, 16, 11, 15, 5}
+ChargingRoom.Computer[connected].Bill[b1].nil{0, 18, 23, 10, 28, 31, 41, 14, 19, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+ConsultingRoom.Patient[patient_prescription,patient_bill_payed].nil{0, 18, 23, 9, 10, 28, 31, 36, 41, 14, 19, 22, 27, 32, 2, 34, 39, 20, 25, 30, 6, 1, 33, 38, 13, 24, 29, 4, 26, 37, 42, 12, 7, 17, 3, 8, 35, 40, 21, 16, 11, 15, 5}
+Pharmacy.$0{0, 23, 28, 31, 36, 14, 19, 27, 32, 2, 39, 20, 25, 30, 1, 33, 38, 13, 4, 26, 37, 42, 12, 7, 17, 3, 35, 40, 21, 11, 16, 5}
+ChargingRoom.Patient[patient_prescription,p2].nil{28, 22, 27, 2, 20, 25, 1, 17, 3, 40}
+ChargingRoom.Decoction[patient_decoction].nil{32, 30, 12, 35, 42, 5}
+Pharmacy.Patient[patient_prescription,p2].nil{14, 42}

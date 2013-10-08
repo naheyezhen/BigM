@@ -1,0 +1,54 @@
+# Controls
+%active ConsultingRoom : 0;
+%active ChargingRoom : 0;
+%active Pharmacy : 0;
+%active Prescription : 1;
+%active Patient : 2;
+%active Material : 0;
+%active Computer : 1;
+%active Hospital : 0;
+%active Bill : 1;
+%active Decoction : 1;
+
+# Rules
+%rule r_0 Hospital.$0 | Patient[p1,p2] -> Hospital.($0 | Patient[p1,p2]);
+%rule r_1 Patient[p1,p2] | ConsultingRoom.$0 | $1 -> ConsultingRoom.($0 | Patient[p1,p2]) | $1;
+%rule r_2 ConsultingRoom.(Patient[p1,p2] | Computer[connected]) | $0 -> ConsultingRoom.(Patient[patient_prescription,p2] | Computer[connected].Prescription[patient_prescription]) | $0;
+%rule r_3 ChargingRoom.Computer[connected] | ConsultingRoom.(Patient[patient_prescription,p2] | Computer[connected].Prescription[patient_prescription]) | $0 -> ChargingRoom.Computer[connected].Bill[b1] | ConsultingRoom.(Patient[patient_prescription,p2] | Computer[connected].Prescription[patient_prescription]) | $0;
+%rule r_4 ConsultingRoom.(Patient[patient_prescription,p2] | $0) | $1 -> ConsultingRoom.$0 | Patient[patient_prescription,p2] | $1;
+%rule r_5 ChargingRoom.$0 | Patient[patient_prescription,p2] | $1 -> ChargingRoom.($0 | Patient[patient_prescription,p2]) | $1;
+%rule r_6 ChargingRoom.(Computer[connected].Bill[b1] | Patient[patient_prescription,p2]) | ConsultingRoom.Computer[connected].Prescription[patient_prescription] | $0 -> ChargingRoom.(Computer[connected].Bill[patient_bill_payed] | Patient[patient_prescription,patient_bill_payed]) | ConsultingRoom.Computer[connected].Prescription[patient_prescription] | $0;
+%rule r_7 Pharmacy.Computer[connected] | ChargingRoom.(Patient[patient_prescription,patient_bill_payed] | Computer[connected].Bill[patient_bill_payed]) | ConsultingRoom.Computer[connected].Prescription[patient_prescription] | $0 -> Pharmacy.(Computer[connected] | Material) | ChargingRoom.(Patient[patient_prescription,patient_bill_payed] | Computer[connected].Bill[patient_bill_payed]) | ConsultingRoom.Computer[connected].Prescription[patient_prescription] | $0;
+%rule r_8 Pharmacy.(Material | $0) | $1 -> Pharmacy.($0 | Decoction[d1]) | $1;
+%rule r_9 ChargingRoom.(Patient[patient_prescription,patient_bill_payed] | $0) | $1 -> ChargingRoom.$0 | Patient[patient_prescription,patient_bill_payed] | $1;
+%rule r_10 Pharmacy.$0 | Patient[patient_prescription,patient_bill_payed] | $1 -> Pharmacy.($0 | Patient[patient_prescription,patient_bill_payed]) | $1;
+%rule r_11 Pharmacy.(Decoction[d1] | Patient[patient_prescription,patient_bill_payed] | $0) | ConsultingRoom.Computer[connected].Prescription[patient_prescription] | ChargingRoom.Computer[connected].Bill[patient_bill_payed] -> Pharmacy.(Decoction[patient_decoction] | Patient[patient_decoction,p2] | $0) | ConsultingRoom.Computer[connected].Prescription[pr1] | ChargingRoom.Computer[connected].Bill[b1];
+%rule r_12 Pharmacy.(Patient[patient_decoction,p2] | Decoction[patient_decoction] | $0) | $1 -> Pharmacy.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction] | $1;
+%rule r_13 Hospital.(Patient[patient_decoction,p2] | Decoction[patient_decoction] | $0) -> Hospital.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction];
+%rule r_14 Patient[patient_prescription,p2] | ConsultingRoom.$0 | $1 -> ConsultingRoom.($0 | Patient[patient_prescription,p2]) | $1;
+%rule r_15 Patient[patient_prescription,patient_bill_payed] | ConsultingRoom.$0 | $1 -> ConsultingRoom.($0 | Patient[patient_prescription,patient_bill_payed]) | $1;
+%rule r_16 Patient[patient_decoction,p2] | ConsultingRoom.$0 | Decoction[patient_decoction] | $1 -> ConsultingRoom.($0 | Patient[patient_decoction,p2] | Decoction[patient_decoction]) | $1;
+%rule r_17 ConsultingRoom.(Patient[p1,p2] | $0) | $1 -> ConsultingRoom.$0 | Patient[p1,p2] | $1;
+%rule r_18 ConsultingRoom.(Patient[patient_prescription,patient_bill_payed] | $0) | $1 -> ConsultingRoom.$0 | Patient[patient_prescription,patient_bill_payed] | $1;
+%rule r_19 ConsultingRoom.(Patient[patient_decoction,p2] | Decoction[patient_decoction] | $0) | $1 -> ConsultingRoom.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction] | $1;
+%rule r_20 ChargingRoom.$0 | Patient[p1,p2] | $1 -> ChargingRoom.($0 | Patient[p1,p2]) | $1;
+%rule r_21 ChargingRoom.$0 | Patient[patient_prescription,patient_bill_payed] | $1 -> ChargingRoom.($0 | Patient[patient_prescription,patient_bill_payed]) | $1;
+%rule r_22 ChargingRoom.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction] | $1 -> ChargingRoom.($0 | Patient[patient_decoction,p2] | Decoction[patient_decoction]) | $1;
+%rule r_23 ChargingRoom.(Patient[p1,p2] | $0) | $1 -> ChargingRoom.$0 | Patient[p1,p2] | $1;
+%rule r_24 ChargingRoom.(Patient[patient_prescription,p2] | $0) | $1 -> ChargingRoom.$0 | Patient[patient_prescription,p2] | $1;
+%rule r_25 ChargingRoom.(Patient[patient_decoction,p2] | Decoction[patient_decoction] | $0) | $1 -> ChargingRoom.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction] | $1;
+%rule r_26 Pharmacy.$0 | Patient[p1,p2] | $1 -> Pharmacy.($0 | Patient[p1,p2]) | $1;
+%rule r_27 Pharmacy.$0 | Patient[patient_prescription,p2] | $1 -> Pharmacy.($0 | Patient[patient_prescription,p2]) | $1;
+%rule r_28 Pharmacy.$0 | Patient[patient_decoction,p2] | Decoction[patient_decoction] | $1 -> Pharmacy.($0 | Patient[patient_decoction,p2] | Decoction[patient_decoction]) | $1;
+%rule r_29 Pharmacy.(Patient[p1,p2] | $0) | $1 -> Pharmacy.$0 | Patient[p1,p2] | $1;
+%rule r_30 Pharmacy.(Patient[patient_prescription,p2] | $0) | $1 -> Pharmacy.$0 | Patient[patient_prescription,p2] | $1;
+%rule r_31 Pharmacy.(Patient[patient_prescription,patient_bill_payed] | $0) | $1 -> Pharmacy.$0 | Patient[patient_prescription,patient_bill_payed] | $1;
+%rule r_32 Hospital.(Patient[p1,p2] | $0) -> Hospital.$0 | Patient[p1,p2];
+%rule r_33 Hospital.(Patient[patient_prescription,p2] | $0) -> Hospital.$0 | Patient[patient_prescription,p2];
+%rule r_34 Hospital.(Patient[patient_prescription,patient_bill_payed] | $0) -> Hospital.$0 | Patient[patient_prescription,patient_bill_payed];
+
+# Model
+%agent Hospital.(ConsultingRoom.Computer[connected] | ChargingRoom.Computer[connected] | Pharmacy.Computer[connected]) | Patient[p1,p2];
+
+# Go!
+%check;

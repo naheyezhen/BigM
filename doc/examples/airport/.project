@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Airport example for BigM</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>dk.itu.bigm.utilities.resources.builder.BigraphBuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>dk.itu.bigm.utilities.resources.builder.BigraphNature</nature>
+	</natures>
+</projectDescription>

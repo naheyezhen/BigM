@@ -1,0 +1,8 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Dummy interaction manager for BigM
+Bundle-SymbolicName: example.bigm.interaction_manager.dummy;singleton:=true
+Bundle-Version: 1.0.0.0
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: dk.itu.bigm;bundle-version="2.1.0",
+ org.eclipse.ui;bundle-version="3.7.0"
