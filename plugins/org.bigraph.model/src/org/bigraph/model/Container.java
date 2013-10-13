@@ -52,8 +52,11 @@ public abstract class Container extends Layoutable {
 		
 		protected ChangeAddChild(Layoutable child, String name, int position) {
 			if(null==name){// 如果没有name这个属性 则说明是类 为了不影响其他逻辑 在模型中 定义name为_
-				name="_";
-				child.setName("_");
+				name="_class_" + System.currentTimeMillis();
+				child.setName("_class_" + System.currentTimeMillis());
+			}else if(name.equals(" ")){
+				name="_anonymousObj_" + System.currentTimeMillis();
+				child.setName("_anonymousObj_" + System.currentTimeMillis());
 			}
 			this.child = child;
 			this.name = name;

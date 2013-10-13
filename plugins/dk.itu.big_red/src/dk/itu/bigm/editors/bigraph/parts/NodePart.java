@@ -83,10 +83,14 @@ public class NodePart extends ContainerPart {
 		String modelName = model.getName();
 		String label = "";
 		String parameter = "";
-		if (modelName.equals("_")) {
-			// 如果name是_ 表示这个control代表的是类 而不是某实例
-			label = ":" + ControlUtilities.getLabel(control);
-		} else {
+		// 从这里开始是对几种类型的control的name进行处理
+		// class
+		if (modelName.startsWith("_class_")) {
+			// 如果name是_class_开头 表示这个control代表的是类 而不是某实例
+			label = " " + ControlUtilities.getLabel(control);
+		}else if(modelName.startsWith("_anonymousObj_")){// 匿名对象anonymousObj
+			label = " :" + ControlUtilities.getLabel(control);
+		} else {// 普通实例
 			label = model.getName() + ":" + ControlUtilities.getLabel(control);
 		}
 		parameter = ParameterUtilities.getParameter(model);
@@ -113,8 +117,10 @@ public class NodePart extends ContainerPart {
 	public String getToolTip() {
 		String tip = "";
 		String modelName = getModel().getName();
-		if (modelName.equals("_")) {
-			// 如果name是_ 表示这个control代表的是类 而不是某实例
+		if (modelName.startsWith("_class_")) {
+			// 如果name是_class_开头 表示这个control代表的是类 而不是某实例
+			tip = getModel().getControl().getName();
+		}else if(modelName.startsWith("_anonymousObj_")){// 匿名对象
 			tip = getModel().getControl().getName();
 		} else {
 			tip = getModel().getControl().getName() + " "

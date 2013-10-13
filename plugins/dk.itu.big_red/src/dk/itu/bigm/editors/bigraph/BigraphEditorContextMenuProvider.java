@@ -145,17 +145,13 @@ public class BigraphEditorContextMenuProvider extends ContextMenuProvider {
 		}
 	}
 
-	private final void addNodeOptions(final NodePart n, final IMenuManager menu) {
+	private final void addClassNodeOptions(final NodePart n, final IMenuManager menu) {
 		String nodeNameString = n.getModel().getName();
-		final Layoutable layoutable = (Layoutable) n.getBigraph();
 		Action a = new Action("isInstance", Action.AS_CHECK_BOX) {
 			@Override
 			public void run() {
-				// 处理为实例或类
-				System.out.println("name before" + n.getModel().getName());
-				System.out.println("name before2 "
-						+ ControlUtilities.getLabel(n.getModel().getControl()));
-				if(!n.getModel().getName().startsWith("_")){// 原来是实例的话
+				// 处理为实例或类				
+				if(!n.getModel().getName().startsWith("_class_")){// 原来是实例的话
 					try {
 						// 这里相当于手工往commandstack里面添加一个change
 						// getViewer().getEditDomain().getCommandStack() 获取commandstack
@@ -165,7 +161,7 @@ public class BigraphEditorContextMenuProvider extends ContextMenuProvider {
 							new ChangeCommand(
 								// 创建一个修改名字的ichange
 								// name-->identifier
-								new NamedModelObject.ChangeNameDescriptor(n.getModel().getIdentifier(),"_")
+								new NamedModelObject.ChangeNameDescriptor(n.getModel().getIdentifier(),"_class_" + System.currentTimeMillis())
 									// 这个地方很纠结PropertyScratchpad 这个东西应该是一个上下文的玩意儿
 									// 后面的resolver应该是要在上下文查找某个东西 具体不清楚。。。
 									.createChange(new PropertyScratchpad(),n.getBigraph())
@@ -174,7 +170,7 @@ public class BigraphEditorContextMenuProvider extends ContextMenuProvider {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}else{
+				}else{// 由类变成实例
 					try {
 						getViewer().getEditDomain().getCommandStack().execute(
 							new ChangeCommand(
@@ -186,15 +182,56 @@ public class BigraphEditorContextMenuProvider extends ContextMenuProvider {
 						e.printStackTrace();
 					}
 				}
-
-				System.out.println("name after " + n.getModel().getName()
-						+ n.getModel().getControl().getName());
-				System.out.println("name after2 "
-						+ ControlUtilities.getLabel(n.getModel().getControl()));
 			}
 		};
 		// 如果是以空格开头 就说明是类，而不是实例
-		a.setChecked(!nodeNameString.startsWith("_"));
+		a.setChecked(!nodeNameString.startsWith("_class_"));
+		menu.appendToGroup(GROUP_VARYING, a);
+	}
+	
+	private final void addAnonymousObjOptions(final NodePart n, final IMenuManager menu) {
+		String nodeNameString = n.getModel().getName();
+		Action a = new Action("isAnonymousObj", Action.AS_CHECK_BOX) {
+			@Override
+			public void run() {
+				// 由于外层已经将class这种情况处理了（变灰不能点），所以这边就不考虑了~
+				// 处理为实例或类				
+				if(!n.getModel().getName().startsWith("_anonymousObj_")){// 普通实例 变成 匿名对象
+					try {
+						// 这里相当于手工往commandstack里面添加一个change
+						// getViewer().getEditDomain().getCommandStack() 获取commandstack
+						getViewer().getEditDomain().getCommandStack().execute(
+							// 创建一个command
+							// changeCommand(Ichange,target)
+							new ChangeCommand(
+								// 创建一个修改名字的ichange
+								// name-->identifier
+								new NamedModelObject.ChangeNameDescriptor(n.getModel().getIdentifier(),"_anonymousObj_" + System.currentTimeMillis())
+									// 这个地方很纠结PropertyScratchpad 这个东西应该是一个上下文的玩意儿
+									// 后面的resolver应该是要在上下文查找某个东西 具体不清楚。。。
+									.createChange(new PropertyScratchpad(),n.getBigraph())
+								, n.getBigraph()));
+					} catch (ChangeCreationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}else{// 由类变成实例
+					try {
+						getViewer().getEditDomain().getCommandStack().execute(
+							new ChangeCommand(
+								new NamedModelObject.ChangeNameDescriptor(
+									n.getModel().getIdentifier(),n.getBigraph().getFirstUnusedName((Layoutable)n.getModel()))
+										.createChange(new PropertyScratchpad(),n.getBigraph()),n.getBigraph()));
+					} catch (ChangeCreationException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		// 不是以class开头 才可能是匿名对象
+		a.setEnabled(!nodeNameString.startsWith("_class_"));
+		a.setChecked(nodeNameString.startsWith("_anonymousObj_"));
 		menu.appendToGroup(GROUP_VARYING, a);
 	}
 
@@ -237,7 +274,8 @@ public class BigraphEditorContextMenuProvider extends ContextMenuProvider {
 					.getLink(), menu);
 		} else if (selection instanceof NodePart) {// 右键选中的是node
 			System.out.println("node part");
-			addNodeOptions((NodePart) selection, menu);
+			addClassNodeOptions((NodePart) selection, menu);
+			addAnonymousObjOptions((NodePart) selection, menu);
 
 		}
 

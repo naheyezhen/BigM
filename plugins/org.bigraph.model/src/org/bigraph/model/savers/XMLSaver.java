@@ -176,8 +176,10 @@ public abstract class XMLSaver extends Saver implements IXMLSaver {
 		for (int i = 0; i < attrs.length; i += 2) {
 			Object attrName = attrs[i], attrValue = attrs[i + 1];
 			if (attrName != null && attrValue != null) {
-				if (attrName.equals("name") && attrValue.equals("_")) {// control是类
+				if (attrName.equals("name") && ((String) attrValue).startsWith("_class_")) {// control是类
 					// do nothing
+				}else if(attrName.equals("name") && ((String) attrValue).startsWith("_anonymousObj_")){// 匿名对象
+					d.setAttributeNS(null, attrName.toString()," ");
 				} else {
 					d.setAttributeNS(null, attrName.toString(),
 							attrValue.toString());
