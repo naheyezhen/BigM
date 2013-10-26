@@ -30,37 +30,65 @@ final class ContainerHandler implements IStepExecutor, IStepValidator {
 			Node cNode = (Node)c;
 			Node lNode = (Node)l;
 			
-			String cSort = cNode.getControl().getPlaceSort();
-			String lSort = lNode.getControl().getPlaceSort();
-			if(!cSort.contains("UserDef:") || !lSort.contains("UserDef:")){
-				return true;
+			FormRules frs = cNode.getControl().getSignature().getFormRules();
+			
+			String cname = cNode.getControl().getName();
+			String lname = lNode.getControl().getName();
+			
+			for(FormationRule fr : frs.getFormationRules()){
+				String sort1 = fr.getSort1();
+				String sort2 = fr.getSort2();
+				
+				if(cname.equals(fr.getSort2()) && lname.equals(fr.getSort1())){
+					if("in".equals(fr.getConstraint())){
+						System.out.println("nahe+++ "+ cname + " in " + lname);
+						return true;
+					} else if("not in".equals(fr.getConstraint())){
+						System.out.println("nahe+++ "+ cname + " not in " + lname);
+						return false;
+					}else{
+						System.out.println("nahe+++ "+ cname + " ?? " + lname);
+						return false;
+					}
+				}
 			}
 			
-			cSort = cSort.split(":")[1];
-			lSort = lSort.split(":")[1];
-				
-			FormRules frs = cNode.getControl().getSignature().getFormRules();
-			if(frs != null && frs.getSortSet() != null && frs.getSortSet().getPlaceSorts() != null){
-				ArrayList<PlaceSort> pss = (ArrayList<PlaceSort>) frs.getSortSet().getPlaceSorts();
-				ArrayList<String> psString = new ArrayList<String>();
-				for(PlaceSort s : pss){
-					psString.add(s.getName());
-				}
-				boolean sortValid = (psString.indexOf(cSort) >= 0) && (psString.indexOf(lSort) >= 0);
-				if(sortValid){
-					for(FormationRule fr : frs.getFormationRules()){
-						if(cSort.equals(fr.getSort2()) && lSort.equals(fr.getSort1())){
-							if("in".equals(fr.getConstraint())){
-								return true;
-							} else{
-								return false;
-							}
-						}
-					}
-					return true;
-				}
-			}
+ 			
+//			String cSort = cNode.getControl().getPlaceSort();
+//			String lSort = lNode.getControl().getPlaceSort();
+			
+			
 			return true;
+//			if(!cSort.contains("UserDef:") || !lSort.contains("UserDef:")){
+//				return true;
+//			}
+//			
+//			
+//			cSort = cSort.split(":")[1];
+//			lSort = lSort.split(":")[1];
+//				
+//			FormRules frs = cNode.getControl().getSignature().getFormRules();
+//			if(frs != null && frs.getSortSet() != null && frs.getSortSet().getPlaceSorts() != null){
+//				ArrayList<PlaceSort> pss = (ArrayList<PlaceSort>) frs.getSortSet().getPlaceSorts();
+//				ArrayList<String> psString = new ArrayList<String>();
+//				for(PlaceSort s : pss){
+//					psString.add(s.getName());
+//				}
+//				boolean sortValid = (psString.indexOf(cSort) >= 0) && (psString.indexOf(lSort) >= 0);
+//				if(sortValid){
+//					for(FormationRule fr : frs.getFormationRules()){
+//						if(cSort.equals(fr.getSort2()) && lSort.equals(fr.getSort1())){
+//							if("in".equals(fr.getConstraint())){
+//								return true;
+//							} else{
+//								return false;
+//							}
+//						}
+//					}
+//					return true;
+//				}
+//			}
+//			return true;
 		}
 		else{
 			return

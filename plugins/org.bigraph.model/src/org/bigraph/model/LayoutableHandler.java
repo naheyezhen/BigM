@@ -50,7 +50,7 @@ final class LayoutableHandler implements IStepExecutor, IStepValidator {
 			Container cp = ch.getParent(context);
 			if (cp == null)
 				throw new ChangeRejectedException(b, ch + " has no parent");
-		} else return false;
+		}else return false;
 		return true;
 	}
 }

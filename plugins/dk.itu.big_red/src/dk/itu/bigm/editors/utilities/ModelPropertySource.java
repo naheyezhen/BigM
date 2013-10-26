@@ -160,13 +160,13 @@ public class ModelPropertySource implements IRedPropertySource {
 					ExtendedDataUtilities.COMMENT, "Comment"));
 		if (object instanceof Layoutable) {
 			if (null != object.getName()) {
-				if (object.getName().startsWith("_class_")) {
+				if (object.getName().startsWith("_class_")) {// 类
 					// do nothing
-				} else if (object.getName().startsWith("_anonymousObj_")) {
+				} else if(object.getName().startsWith("_anonymousObj_")){
 					NullTextPropertyDescriptor d = new NullTextPropertyDescriptor(
 							"", "Name");
 					addPropertyDescriptor(d);
-				} else {
+				}else { // 对象  其中，匿名对象name的处理在getProrerty中进行
 					NullTextPropertyDescriptor d = new NullTextPropertyDescriptor(
 							Layoutable.PROPERTY_NAME, "Name");
 					d.setValidator(new NameValidator());
@@ -184,6 +184,7 @@ public class ModelPropertySource implements IRedPropertySource {
 	}
 
 	@Override
+	// 获取属性的值
 	public Object getPropertyValue(Object id) {
 		if (id.equals("Class")) {
 			return object.getType();
@@ -197,6 +198,9 @@ public class ModelPropertySource implements IRedPropertySource {
 			} else if (ColourUtilities.OUTLINE.equals(id)) {
 				return ColourUtilities.getOutline(object).getRGB();
 			} else if (Layoutable.PROPERTY_NAME.equals(id)) {
+				if(object.getName().startsWith("_anonymousObj_")){// 匿名对象
+					return " ";
+				}
 				return object.getName();
 			} else if (ExtendedDataUtilities.LINKSORT.equals(id)) {
 				return ExtendedDataUtilities.getLinkType((Link) object);
