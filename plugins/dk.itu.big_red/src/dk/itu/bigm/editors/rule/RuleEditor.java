@@ -1,23 +1,41 @@
 package dk.itu.bigm.editors.rule;
 
+import java.awt.List;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.bigraph.model.Bigraph;
+import org.bigraph.model.Container;
 import org.bigraph.model.Layoutable;
+import org.bigraph.model.ModelObject;
 import org.bigraph.model.ReactionRule;
+import org.bigraph.model.FormRules;
 import org.bigraph.model.assistants.PropertyScratchpad;
 import org.bigraph.model.changes.ChangeRejectedException;
 import org.bigraph.model.changes.IChange;
 import org.bigraph.model.changes.descriptors.ChangeCreationException;
 import org.bigraph.model.changes.descriptors.ChangeDescriptorGroup;
 import org.bigraph.model.changes.descriptors.IChangeDescriptor;
+import org.bigraph.model.loaders.BigraphXMLLoader;
 import org.bigraph.model.loaders.LoadFailedException;
+import org.bigraph.model.loaders.FormRulesXMLLoader;
+import org.bigraph.model.loaders.Loader;
+import org.bigraph.model.loaders.XMLLoader;
+import org.bigraph.model.resources.IFileWrapper;
+import org.bigraph.model.resources.IResourceWrapper;
+import org.bigraph.model.resources.JavaFileWrapper;
 import org.bigraph.model.savers.ReactionRuleXMLSaver;
 import org.bigraph.model.savers.SaveFailedException;
+import org.bigraph.model.wrapper.LoaderUtilities;
+import org.dom4j.CDATA;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.gef.KeyHandler;
 import org.eclipse.gef.KeyStroke;
@@ -56,6 +74,9 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.w3c.dom.Element;
+
+import scala.annotation.StaticAnnotation;
 
 import dk.itu.bigm.editors.AbstractGEFEditor;
 import dk.itu.bigm.editors.actions.TogglePropertyAction;
@@ -66,28 +87,30 @@ import dk.itu.bigm.editors.bigraph.actions.ContainerCopyAction;
 import dk.itu.bigm.editors.bigraph.actions.ContainerCutAction;
 import dk.itu.bigm.editors.bigraph.actions.ContainerPasteAction;
 import dk.itu.bigm.editors.bigraph.actions.ContainerPropertiesAction;
-import dk.itu.bigm.editors.bigraph.actions.FilePrintAction;
 import dk.itu.bigm.editors.bigraph.commands.ChangeCommand;
 import dk.itu.bigm.editors.bigraph.parts.PartFactory;
+import dk.itu.bigm.editors.formation_rules.FormationRulesEditor;
 import dk.itu.bigm.utilities.resources.EclipseFileWrapper;
 import dk.itu.bigm.utilities.ui.UI;
 
 public class RuleEditor extends AbstractGEFEditor implements
 		ISelectionChangedListener, ISelectionProvider {
+	private static int deleteTagString = 0;
 	@Override
+
 	public Object getAdapter(@SuppressWarnings("rawtypes") Class adapter) {
 		if (adapter == ZoomManager.class) {
 			/* required by ZoomComboContributionItem */
 			ScalableRootEditPart sep = getScalableRoot(redexViewer);
 			return (sep != null ? sep.getZoomManager() : null);
-		} else return super.getAdapter(adapter);
+		} else
+			return super.getAdapter(adapter);
 	}
-	
-	private ArrayList<ISelectionChangedListener> listeners =
-		new ArrayList<ISelectionChangedListener>();
-	
+
+	private ArrayList<ISelectionChangedListener> listeners = new ArrayList<ISelectionChangedListener>();
+
 	private ISelection selection = null;
-	
+
 	@Override
 	public void addSelectionChangedListener(ISelectionChangedListener listener) {
 		listeners.add(listener);
@@ -108,19 +131,19 @@ public class RuleEditor extends AbstractGEFEditor implements
 	public void setSelection(ISelection selection) {
 		this.selection = selection;
 		updateActions(getSelectionActions());
-		
+
 		if (listeners.size() == 0)
 			return;
-		SelectionChangedEvent e =
-				new SelectionChangedEvent(this, getSelection());
+		SelectionChangedEvent e = new SelectionChangedEvent(this,
+				getSelection());
 		for (ISelectionChangedListener l : listeners)
 			l.selectionChanged(e);
 	}
-	
+
 	private ScrollingGraphicalViewer redexViewer, reactumViewer;
 
 	private boolean ignoringSelectionUpdates = false;
-	
+
 	/**
 	 * Fired by the redex and reactum viewers when their selections change.
 	 */
@@ -129,22 +152,21 @@ public class RuleEditor extends AbstractGEFEditor implements
 		if (ignoringSelectionUpdates)
 			return;
 		ignoringSelectionUpdates = true;
-		
+
 		if (!event.getSelection().isEmpty())
-			(event.getSource() == reactumViewer ?
-					redexViewer : reactumViewer).deselectAll();
-		
+			(event.getSource() == reactumViewer ? redexViewer : reactumViewer)
+					.deselectAll();
+
 		setSelection(event.getSelection());
 		ignoringSelectionUpdates = false;
 	}
-	
+
 	@Override
 	public void doActualSave(IFile f, OutputStream os)
 			throws SaveFailedException {
-    	ReactionRuleXMLSaver r = new ReactionRuleXMLSaver().setModel(getModel());
-		r.setFile(new EclipseFileWrapper(f)).
-    		setOutputStream(os).exportObject();
-		CommandStack commandStack = getCommandStack();
+		ReactionRuleXMLSaver r = new ReactionRuleXMLSaver()
+				.setModel(getModel());
+		r.setFile(new EclipseFileWrapper(f)).setOutputStream(os).exportObject();
 		getCommandStack().markSaveLocation();
 	}
 
@@ -154,95 +176,89 @@ public class RuleEditor extends AbstractGEFEditor implements
 		super.init(site, input);
 	}
 
-	// 这里应该是新加一个control
 	@Override
 	public void createEditorControl(Composite parent) {
 		SashForm splitter = new SashForm(parent, SWT.HORIZONTAL | SWT.SMOOTH);
-		
+
 		redexViewer = new ScrollingGraphicalViewer();
 		reactumViewer = new ScrollingGraphicalViewer();
-		
+
 		createPaletteViewer(splitter);
 		Composite c = new Composite(splitter, SWT.NONE);
-		
+
 		splitter.setWeights(BigraphEditor.INITIAL_SASH_WEIGHTS);
-		
+
 		GridLayout gl = new GridLayout(3, false);
-		gl.marginTop = gl.marginLeft = gl.marginBottom = gl.marginRight = 
-			gl.horizontalSpacing = gl.verticalSpacing = 10;
+		gl.marginTop = gl.marginLeft = gl.marginBottom = gl.marginRight = gl.horizontalSpacing = gl.verticalSpacing = 10;
 		c.setLayout(gl);
 
 		redexViewer.createControl(c);
 		redexViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		Label l = new Label(c, SWT.NONE);
 		l.setText("\u2192");
 		l.setFont(UI.tweakFont(l.getFont(), 40, SWT.BOLD));
 		l.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, false, false));
-		
+
 		reactumViewer.createControl(c);
 		reactumViewer.getControl().setLayoutData(
 				new GridData(SWT.FILL, SWT.FILL, true, true));
-		
+
 		configureGraphicalViewer();
-		
-		org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(
-				c, SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
+
+		org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(c,
+				SWT.BORDER | SWT.SINGLE | SWT.V_SCROLL);
 		GridData gd = new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1);
 		gd.heightHint = 100;
 		list.setLayoutData(gd);
-		
+
 		redexViewer.getControl().setBackground(ColorConstants.listBackground);
 		reactumViewer.getControl().setBackground(ColorConstants.listBackground);
 	}
-	
+
 	protected void configureGraphicalViewer() {
 		redexViewer.setEditDomain(getEditDomain());
 		reactumViewer.setEditDomain(getEditDomain());
-		
+
 		redexViewer.setEditPartFactory(new PartFactory());
 		reactumViewer.setEditPartFactory(new PartFactory() {
 			@Override
 			public IPropertySource getPropertySource(Object o) {
-				return (o instanceof Layoutable ?
-						new ReactumPropertySource((Layoutable)o) : null);
+				return (o instanceof Layoutable ? new ReactumPropertySource(
+						(Layoutable) o) : null);
 			}
 		});
-		
-		ScalableRootEditPart
-			redexRoot = new ScalableRootEditPart(),
-			reactumRoot = new ScalableRootEditPart();
+
+		ScalableRootEditPart redexRoot = new ScalableRootEditPart(), reactumRoot = new ScalableRootEditPart();
 		redexViewer.setRootEditPart(redexRoot);
 		reactumViewer.setRootEditPart(reactumRoot);
-		
-		redexViewer.setContextMenu(
-			new BigraphEditorContextMenuProvider(
-					redexViewer, getActionRegistry()));
-		reactumViewer.setContextMenu(
-			new BigraphEditorContextMenuProvider(
-					reactumViewer, getActionRegistry()));
-		
+
+		redexViewer.setContextMenu(new BigraphEditorContextMenuProvider(
+				redexViewer, getActionRegistry()));
+		reactumViewer.setContextMenu(new BigraphEditorContextMenuProvider(
+				reactumViewer, getActionRegistry()));
+
 		redexViewer.addSelectionChangedListener(this);
 		reactumViewer.addSelectionChangedListener(this);
 		getSite().setSelectionProvider(this);
-		
-		final ZoomManager
-			redexZoom = redexRoot.getZoomManager(),
-			reactumZoom = reactumRoot.getZoomManager();
-		
+
+		final ZoomManager redexZoom = redexRoot.getZoomManager(), reactumZoom = reactumRoot
+				.getZoomManager();
+
 		redexZoom.setZoomLevels(BigraphEditor.STOCK_ZOOM_LEVELS);
 		reactumZoom.setZoomLevels(BigraphEditor.STOCK_ZOOM_LEVELS);
-		redexZoom.setZoomLevelContributions(
-				BigraphEditor.STOCK_ZOOM_CONTRIBUTIONS);
-		reactumZoom.setZoomLevelContributions(
-				BigraphEditor.STOCK_ZOOM_CONTRIBUTIONS);
-		
-	    registerActions(null,
-	    		new ZoomInAction(redexZoom), new ZoomOutAction(reactumZoom));
-		
+		redexZoom
+				.setZoomLevelContributions(BigraphEditor.STOCK_ZOOM_CONTRIBUTIONS);
+		reactumZoom
+				.setZoomLevelContributions(BigraphEditor.STOCK_ZOOM_CONTRIBUTIONS);
+
+		registerActions(null, new ZoomInAction(redexZoom), new ZoomOutAction(
+				reactumZoom));
+
 		final ZoomListener zoomSynchroniser = new ZoomListener() {
 			private boolean lock = false;
+
 			@Override
 			public void zoomChanged(double zoom) {
 				if (lock)
@@ -256,100 +272,101 @@ public class RuleEditor extends AbstractGEFEditor implements
 				}
 			}
 		};
-		
+
 		redexZoom.addZoomListener(zoomSynchroniser);
 		reactumZoom.addZoomListener(zoomSynchroniser);
-		
+
 		KeyHandler keyHandler = new KeyHandler();
-	    keyHandler.put(KeyStroke.getPressed(SWT.DEL, SWT.DEL, 0),
-		    	getActionRegistry().getAction(ActionFactory.DELETE.getId()));
+		keyHandler.put(KeyStroke.getPressed(SWT.DEL, SWT.DEL, 0),
+				getActionRegistry().getAction(ActionFactory.DELETE.getId()));
 		keyHandler.put(KeyStroke.getPressed('+', SWT.KEYPAD_ADD, SWT.NONE),
 				new Action() {
-			@Override
-			public void run() {
-				redexZoom.zoomIn();
-			}
-		});
-		keyHandler.put(KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT, SWT.NONE),
+					@Override
+					public void run() {
+						redexZoom.zoomIn();
+					}
+				});
+		keyHandler.put(
+				KeyStroke.getPressed('-', SWT.KEYPAD_SUBTRACT, SWT.NONE),
 				new Action() {
-			@Override
-			public void run() {
-				redexZoom.zoomOut();
-			}
-		});
-		
+					@Override
+					public void run() {
+						redexZoom.zoomOut();
+					}
+				});
+
 		redexViewer.setKeyHandler(keyHandler);
 		reactumViewer.setKeyHandler(keyHandler);
-		
+
 		String stateMask = MouseWheelHandler.KeyGenerator.getKey(SWT.CTRL);
-		System.out.println("stateMask "+stateMask);
-	    redexViewer.setProperty(stateMask, MouseWheelZoomHandler.SINGLETON);
-	    reactumViewer.setProperty(stateMask, MouseWheelZoomHandler.SINGLETON);
-		
-	    registerActions(null,
-	    		new ToggleGridAction(redexViewer) {
-	    			@Override
-	    			public void run() {
-	    				super.run();
-	    				boolean val = isChecked();
-	    				reactumViewer.setProperty(
-	    						SnapToGrid.PROPERTY_GRID_VISIBLE, val);
-	    				reactumViewer.setProperty(
-	    						SnapToGrid.PROPERTY_GRID_ENABLED, val);
-	    			}
-	    		},
-	    		new ToggleSnapToGeometryAction(redexViewer) {
-	    			@Override
-	    			public void run() {
-	    				super.run();
-	    				boolean val = isChecked();
-	    				reactumViewer.setProperty(
-	    						SnapToGeometry.PROPERTY_SNAP_ENABLED, val);
-	    			}
-	    		},
-	    		new TogglePropertyAction(
-	    				PROPERTY_DISPLAY_GUIDES, true, redexViewer) {
-	    			@Override
-	    			public void run() {
-	    				super.run();
-	    				reactumViewer.setProperty(
-	    						PROPERTY_DISPLAY_GUIDES, isChecked());
-	    			}
-	    		});
+		redexViewer.setProperty(stateMask, MouseWheelZoomHandler.SINGLETON);
+		reactumViewer.setProperty(stateMask, MouseWheelZoomHandler.SINGLETON);
+
+		registerActions(null,
+				new ToggleGridAction(redexViewer) {
+					@Override
+					public void run() {
+						super.run();
+						boolean val = isChecked();
+						reactumViewer.setProperty(
+								SnapToGrid.PROPERTY_GRID_VISIBLE, val);
+						reactumViewer.setProperty(
+								SnapToGrid.PROPERTY_GRID_ENABLED, val);
+					}
+				}, new ToggleSnapToGeometryAction(redexViewer) {
+					@Override
+					public void run() {
+						super.run();
+						boolean val = isChecked();
+						reactumViewer.setProperty(
+								SnapToGeometry.PROPERTY_SNAP_ENABLED, val);
+					}
+				},
+				new TogglePropertyAction(PROPERTY_DISPLAY_GUIDES, true,
+						redexViewer) {
+					@Override
+					public void run() {
+						super.run();
+						reactumViewer.setProperty(PROPERTY_DISPLAY_GUIDES,
+								isChecked());
+					}
+				});
 	}
-	
+
 	private ReactionRule model;
-	
+	private FormRules model1;
+
 	@Override
 	public ReactionRule getModel() {
 		return model;
 	}
-	
+
 	@Override
 	protected void loadModel() throws LoadFailedException {
-		model = (ReactionRule)loadInput();		
+		model = (ReactionRule) loadInput();
 	}
-	
+
 	@Override
 	protected void updateEditorControl() {
 		if (getError() != null)
 			return;
 		getCommandStack().flush();
-	    updateNodePalette(getModel().getRedex().getSignature());
-	    redexViewer.setContents(model.getRedex());
-	    reactumViewer.setContents(model.getReactum());
-    }
-	
+		updateNodePalette(getModel().getRedex().getSignature());
+		redexViewer.setContents(model.getRedex());
+		reactumViewer.setContents(model.getReactum());
+	}
+
 	private Bigraph getRedex() {
 		return getModel().getRedex();
 	}
-	
+
 	private Bigraph getReactum() {
 		return getModel().getReactum();
 	}
-	
+
 	@Override
 	public void stackChanged(CommandStackEvent event) {
+		FormRulesXMLLoader fr = new FormRulesXMLLoader();     
 		int detail = event.getDetail() & CommandStack.PRE_MASK;
 		if (detail != 0)
 			_testConvert(event.getDetail(), event.getCommand());
@@ -358,84 +375,97 @@ public class RuleEditor extends AbstractGEFEditor implements
 
 	private void _testConvert(int detail, Command c) {
 		if (c instanceof ChangeCommand) {
-			_testConvertChange(detail, (ChangeCommand)c);
+			_testConvertChange(detail, (ChangeCommand) c);
 		} else if (c instanceof CompoundCommand) {
-			for (Object i : ((CompoundCommand)c).getCommands())
+			for (Object i : ((CompoundCommand) c).getCommands())
 				if (i instanceof Command)
-					_testConvert(detail, (Command)i);
+					_testConvert(detail, (Command) i);
 		}
 	}
-	
-	private Map<IChange, IChangeDescriptor> reactumChangeToDescriptor =
-			new HashMap<IChange, IChangeDescriptor>();
-	private Map<IChange, IChange> safeRedexToReactum =
-			new HashMap<IChange, IChange>();
-	
+
+	private Map<IChange, IChangeDescriptor> reactumChangeToDescriptor = new HashMap<IChange, IChangeDescriptor>();
+	private Map<IChange, IChange> safeRedexToReactum = new HashMap<IChange, IChange>();
+
 	private void _testConvertChange(int detail, ChangeCommand c) {
 		IChange commandChange = c.getChange();
 		Object target = c.getTarget();
-		
-		ChangeDescriptorGroup reactumChanges = getModel().getEdit().getDescriptors();
+		ChangeDescriptorGroup reactumChanges = getModel().getEdit()
+				.getDescriptors();
 		if (target == getRedex()) {
-			IChangeDescriptor cd =
-				DescriptorUtilities.createDescriptor(
-					(detail != CommandStack.PRE_UNDO ?
-						commandChange : commandChange.inverse()));
-			
-			ChangeDescriptorGroup lRedexCDs =
-					DescriptorUtilities.linearise(cd);
-			ChangeDescriptorGroup cdg =
-					ReactionRule.performFixups(lRedexCDs, reactumChanges);
+			IChangeDescriptor cd = DescriptorUtilities
+					.createDescriptor((detail != CommandStack.PRE_UNDO ? commandChange
+							: commandChange.inverse()));
+			ChangeDescriptorGroup lRedexCDs = DescriptorUtilities.linearise(cd);
+			ChangeDescriptorGroup cdg = ReactionRule.performFixups(lRedexCDs,
+					reactumChanges);
+			String deleteTag = cd.toString().substring(18, 25);
+			deleteTag = deleteTag.trim();
+			if (deleteTag.equals("remove")) {
+				cdg.clear();
+			}
 
 			/* Integrity check */
 			try {
 				PropertyScratchpad scratch = new PropertyScratchpad();
 				if (detail != CommandStack.PRE_UNDO) {
 					commandChange.simulate(scratch);
-				} else commandChange.inverse().simulate(scratch);
-				/* scratch now contains the prospective state of the redex
-				 * after the change has been applied. Check that we can still
-				 * get to the reactum from there */
+				} else
+					commandChange.inverse().simulate(scratch);
+				/*
+				 * scratch now contains the prospective state of the redex after
+				 * the change has been applied. Check that we can still get to
+				 * the reactum from there
+				 */
 				getRedex().tryValidateChange(scratch,
 						cdg.createChange(scratch, getRedex()));
 			} catch (ChangeCreationException cce) {
-				throw new Error("BUG: post-fixup reactum changes are " +
-						"completely inconsistent, don't save", cce);
+				throw new Error("BUG: post-fixup reactum changes are "
+						+ "completely inconsistent, don't save", cce);
 			} catch (ChangeRejectedException cre) {
-				throw new Error("BUG: post-fixup reactum changes are " +
-						"slightly inconsistent, don't save", cre);
+				throw new Error("BUG: post-fixup reactum changes are "
+						+ "slightly inconsistent, don't save", cre);
 			}
-			
-			/* cdg will be equal to reactumChanges if the fixup operations made
-			 * no changes */
+
+			/*
+			 * cdg will be equal to reactumChanges if the fixup operations made
+			 * no changes
+			 */
 			if (cdg != reactumChanges) {
 				reactumChanges.clear();
 				reactumChanges.addAll(cdg);
 			}
-			
+
 			IChange instantiatedReactumChanges;
-			/* Anything that's left in lRedexCDs after the fixups should be
-			 * unrelated to the reactum changes, and so should be safe to
-			 * apply */
+			/*
+			 * Anything that's left in lRedexCDs after the fixups should be
+			 * unrelated to the reactum changes, and so should be safe to apply
+			 */
 			try {
-				if (detail != CommandStack.PRE_UNDO) { 
-					instantiatedReactumChanges =
-							lRedexCDs.createChange(null, getReactum());
-					getReactum().tryApplyChange(instantiatedReactumChanges);
-					safeRedexToReactum.put(
-							commandChange, instantiatedReactumChanges);
+				if (detail != CommandStack.PRE_UNDO) {
+					instantiatedReactumChanges = lRedexCDs.createChange(null,
+							getReactum());
+					if (!instantiatedReactumChanges.toString().equals("[null]")) {
+						getReactum().tryApplyChange(instantiatedReactumChanges);
+						safeRedexToReactum.put(commandChange,
+								instantiatedReactumChanges);
+					} else {
+						deleteTagString = 1;
+					}
 				} else {
-					instantiatedReactumChanges =
-							safeRedexToReactum.remove(commandChange);
-					getReactum().tryApplyChange(
-							instantiatedReactumChanges.inverse());
+					if (deleteTagString==0) {
+						instantiatedReactumChanges = safeRedexToReactum
+								.remove(commandChange);
+
+						getReactum().tryApplyChange(
+								instantiatedReactumChanges.inverse());
+					}
 				}
 			} catch (ChangeCreationException cce) {
-				throw new Error("BUG: completely unsafe change slipped " +
-						"through the net", cce);
+				throw new Error("BUG: completely unsafe change slipped "
+						+ "through the net", cce);
 			} catch (ChangeRejectedException cre) {
-				throw new Error("BUG: slightly unsafe change slipped " +
-						"through the net", cre);
+				throw new Error("BUG: slightly unsafe change slipped "
+						+ "through the net", cre);
 			}
 		} else if (target == getReactum()) {
 			IChangeDescriptor cd;
@@ -449,18 +479,17 @@ public class RuleEditor extends AbstractGEFEditor implements
 			}
 		}
 	}
-	
+
 	@Override
 	protected void createActions() {
-		registerActions(getSelectionActions(),
-			new DeleteAction((IWorkbenchPart)this),
-			new ContainerPropertiesAction(this), new ContainerCutAction(this),
-			new ContainerCopyAction(this), new BigraphRelayoutAction(this),
-			new ContainerPasteAction(this));
+		registerActions(getSelectionActions(), new DeleteAction(
+				(IWorkbenchPart) this), new ContainerPropertiesAction(this),
+				new ContainerCutAction(this), new ContainerCopyAction(this),
+				new BigraphRelayoutAction(this), new ContainerPasteAction(this));
 
 		registerActions(null, new SelectAllAction(this));
 	}
-	
+
 	@Override
 	public void updateEditor() {
 		try {

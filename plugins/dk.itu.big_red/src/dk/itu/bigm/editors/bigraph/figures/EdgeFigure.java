@@ -70,9 +70,7 @@ public class EdgeFigure extends AbstractFigure {
 			graphics.setAlpha(64);
 			graphics.setLineWidth(2);
 			graphics.setLineStyle(SWT.LINE_SOLID);
-			//graphics.drawOval(a);
-
-			//graphics.drawRectangle(a);
+			graphics.drawRectangle(a);
 			
 			if (single) {
 				graphics.setAlpha(255);

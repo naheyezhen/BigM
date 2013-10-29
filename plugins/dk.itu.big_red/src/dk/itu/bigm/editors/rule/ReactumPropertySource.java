@@ -16,7 +16,6 @@ public class ReactumPropertySource extends ModelPropertySource {
 	private class AliasValidator extends ChangeValidator {
 		@Override
 		public IChange getChange(Object value) {
-			System.out.println("value "+value);
 			return ExtendedDataUtilities.changeAlias(
 					((Site)getModel()), (String)value);
 		}
@@ -24,7 +23,6 @@ public class ReactumPropertySource extends ModelPropertySource {
 	
 	@Override
 	public Object getPropertyValue(Object id) {
-		System.out.println("getPropertyValue "+id);
 		if (ExtendedDataUtilities.ALIAS.equals(id)) {
 			return ExtendedDataUtilities.getAlias((Site)getModel());
 		} else return super.getPropertyValue(id);
@@ -32,7 +30,6 @@ public class ReactumPropertySource extends ModelPropertySource {
 	
 	@Override
 	protected void buildPropertyDescriptors() {
-		System.out.println("buildPropertyDescriptors ");
 		super.buildPropertyDescriptors();
 		if (getModel() instanceof Site) {
 			NullTextPropertyDescriptor d = new NullTextPropertyDescriptor(
@@ -44,7 +41,6 @@ public class ReactumPropertySource extends ModelPropertySource {
 	
 	@Override
 	public IChange setPropertyValueChange(Object id, Object newValue) {
-		System.out.println("new value "+newValue);
 		if (ExtendedDataUtilities.ALIAS.equals(id)) {
 			return ExtendedDataUtilities.changeAlias(
 					(Site)getModel(), (String)newValue);
@@ -53,7 +49,6 @@ public class ReactumPropertySource extends ModelPropertySource {
 	
 	@Override
 	public IChange resetPropertyValueChange(Object id) {
-		System.out.println("id "+id);
 		if (ExtendedDataUtilities.ALIAS.equals(id)) {
 			return ExtendedDataUtilities.changeAlias((Site)getModel(), null);
 		} else return super.resetPropertyValueChange(id);

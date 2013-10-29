@@ -79,7 +79,7 @@ implements PropertyChangeListener {
 	private FormRules model = null;
 	
 	@Override
-	protected FormRules getModel() {
+	public FormRules getModel() {
 		return model;
 	}
 	

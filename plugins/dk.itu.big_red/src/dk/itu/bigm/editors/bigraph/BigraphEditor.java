@@ -218,7 +218,6 @@ public class BigraphEditor extends AbstractGEFEditor {
 	@Override
 	protected void loadModel() throws LoadFailedException {
 		model = (Bigraph)loadInput();
-		//System.out.println("nahe+++ loadModel");
 	}
 	
 	@Override

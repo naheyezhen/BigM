@@ -52,8 +52,6 @@ final class ContainerDescriptorHandler
 
 	private static boolean canContain(
 			Container.Identifier c, Layoutable.Identifier l) {
-		//System.out.println("nahe+++ i am in canContain @ ContainerDescriptor");
-		
 		return
 			(c instanceof Bigraph.Identifier &&
 				(l instanceof Edge.Identifier ||

@@ -215,8 +215,7 @@ public abstract class Layoutable extends NamedModelObject {
 				throws ChangeCreationException {
 			Layoutable l = target.lookup(context, r);
 			if (l == null)
-				throw new ChangeCreationException(this,
-						"" + target + " didn't resolve to a Layoutable");
+				return null;
 			return l.changeRemove();
 		}
 		

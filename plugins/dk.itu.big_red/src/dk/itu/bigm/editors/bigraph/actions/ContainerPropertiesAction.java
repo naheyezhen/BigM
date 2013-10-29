@@ -40,7 +40,6 @@ public class ContainerPropertiesAction extends SelectionAction {
 	public void run() {
 		try {
 			UI.getWorkbenchPage().showView(IPageLayout.ID_PROP_SHEET);
-//			System.out.println("IPageLayout.ID_PROP_SHEET " +IPageLayout.ID_PROP_SHEET);
 		} catch (PartInitException e) {
 			e.printStackTrace();
 		}

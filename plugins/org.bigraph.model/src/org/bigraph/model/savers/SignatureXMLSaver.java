@@ -138,77 +138,11 @@ public class SignatureXMLSaver extends XMLSaver {
 			gr.appendChild(pAR);	
 		
 		Element asC = doc.createElementNS(BIGM, "bigm:shape");
-		// 圆圈 oval 其他图形的话 要自己手动设置点……略纠结……
-		//asC.setAttributeNS(BIGM, "bigm:shape", "oval");
-		if (name.equals("NotEqual")){
-			asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-			int x[] = {-30,20,30,40,30,40,40,20,10,40,40,0,-10,-20,-10,-30,-30,0,10,-30};
-			int y[] = {-10,-10,-20,-20,-10,-10,0,0,10,10,20,20,30,30,20,20,10,10,0,0};
-			for(int i = 0; i<20 ; i++){
-				Element ne = doc.createElementNS(BIGM, "bigm:point");
-				ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-				ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-				asC.appendChild(ne);
-			}
-		}
-		else if(name.equals("Greater")){
-			asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-			int x[] = {0,50,0,0,40,0};
-			int y[] = {-40,0,40,30,0,-30};
-			for(int i = 0; i<x.length ; i++){
-				Element ne = doc.createElementNS(BIGM, "bigm:point");
-				ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-				ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-				asC.appendChild(ne);
-			}
-		}else if(name.equals("Less")){
-			asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-			int x[] = {40,40,10,40,40,0};
-			int y[] = {-10,0,30,60,70,30};
-			for(int i = 0; i<x.length ; i++){
-				Element ne = doc.createElementNS(BIGM, "bigm:point");
-				ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-				ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-				asC.appendChild(ne);
-			}
-		}else if(name.equals("GreaterOrEqual")){
-				asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-				int x[] = {0,50,0,0,50,50,0,0,40,0};
-				int y[] = {-40,10,50,60,20,30,70,40,10,-30};
-				for(int i = 0; i<x.length ; i++){
-					Element ne = doc.createElementNS(BIGM, "bigm:point");
-					ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-					ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-					asC.appendChild(ne);
-				}
-		}else if(name.equals("LessOrEqual")){
-			asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-			int x[] = {50,50,10,50,50,0,0,50,50,0};
-			int y[] = {-30,-20,30,70,90,40,50,100,80,30};
-			for(int i = 0; i<x.length ; i++){
-				Element ne = doc.createElementNS(BIGM, "bigm:point");
-				ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-				ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-				asC.appendChild(ne);
-			}
-		}else if(name.equals("Equal")){
-			asC.setAttributeNS(BIGM, "bigm:shape", "polygon");
-			int x[] = {-30,40,40,-30,-30,40,40,-30};
-			int y[] = {-10,-10,0,0,10,10,20,20};
-			for(int i = 0; i<x.length ; i++){
-				Element ne = doc.createElementNS(BIGM, "bigm:point");
-				ne.setAttributeNS(BIGM, "bigm:x", ""+x[i]);
-				ne.setAttributeNS(BIGM, "bigm:y", ""+y[i]);
-				asC.appendChild(ne);
-			}
-		}
-		else
-			asC.setAttributeNS(BIGM, "bigm:shape", "oval");
+		asC.setAttributeNS(BIGM, "bigm:shape", "oval");
 		control.appendChild(asC);
 		
 		Element aEC = doc.createElementNS(BIGM, "bigm:appearance");
-		aEC.setAttributeNS(BIGM, "bigm:outlineColor", "#0080c0");
-		aEC.setAttributeNS(BIGM, "bigm:fillColor", "#0080c0");
+		aEC.setAttributeNS(BIGM, "bigm:outlineColor", "#ff0000");
 		control.appendChild(aEC);
 		
 		e.appendChild(control);	

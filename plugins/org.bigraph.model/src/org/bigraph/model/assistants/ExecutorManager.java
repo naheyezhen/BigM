@@ -51,7 +51,7 @@ public class ExecutorManager extends ValidatorManager
 	@Override
 	public void tryApplyChange(IChange change)
 			throws ChangeRejectedException {
-		tryValidateChange(change);
+		//tryValidateChange(change);
 		
 		IChange ch = run(change);
 		if (ch != null)
